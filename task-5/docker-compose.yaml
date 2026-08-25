@@ -1,0 +1,45 @@
+# docker compose file for running frontend + backend together
+# both services are on the same network so they can talk to each other
+
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      # this tells the frontend where to find the backend
+      # "backend" is the service name below, docker compose resolves it
+      # to the right IP address automatically on the app-network
+      - BACKEND_URL=http://backend:5000
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - app-network
+    # health check - makes sure frontend is responding
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    networks:
+      - app-network
+    # health check - make sure flask is responding
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+# custom bridge network - containers can reach each other using service names
+# like "backend" and "frontend" instead of IP addresses
+networks:
+  app-network:
+    driver: bridge

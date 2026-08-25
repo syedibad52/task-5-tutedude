@@ -1,0 +1,7 @@
+# dont need these in the docker image
+__pycache__
+*.pyc
+venv/
+.git
+.gitignore
+README.md
