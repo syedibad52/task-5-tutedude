@@ -1,22 +1,32 @@
-# docker compose file for running frontend + backend together
-# both services are on the same network so they can talk to each other
+# ============================================================
+# Docker Compose Configuration — Full Stack App
+# ============================================================
+# This file defines two services:
+#   1. frontend  — Node.js + Express (port 3000)
+#   2. backend   — Python + Flask   (port 5000)
+#
+# Both services share a custom bridge network (app-network)
+# so they can communicate using service names as hostnames.
+# ============================================================
 
 services:
+
+  # ──────────────────────────────────────────
+  # Frontend Service (Node.js + Express)
+  # ──────────────────────────────────────────
   frontend:
     build: ./frontend
     ports:
-      - "3000:3000"
+      - "3000:3000"                        # Host:Container port mapping
     environment:
-      # this tells the frontend where to find the backend
-      # "backend" is the service name below, docker compose resolves it
-      # to the right IP address automatically on the app-network
+      # The frontend uses this URL to reach the Flask backend.
+      # "backend" resolves to the backend container's IP via Docker DNS.
       - BACKEND_URL=http://backend:5000
     depends_on:
       backend:
-        condition: service_healthy
+        condition: service_healthy          # Wait for backend to be healthy
     networks:
       - app-network
-    # health check - makes sure frontend is responding
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000"]
       interval: 30s
@@ -24,13 +34,15 @@ services:
       retries: 3
       start_period: 10s
 
+  # ──────────────────────────────────────────
+  # Backend Service (Python + Flask)
+  # ──────────────────────────────────────────
   backend:
     build: ./backend
     ports:
-      - "5000:5000"
+      - "5000:5000"                        # Host:Container port mapping
     networks:
       - app-network
-    # health check - make sure flask is responding
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/')"]
       interval: 30s
@@ -38,8 +50,12 @@ services:
       retries: 3
       start_period: 10s
 
-# custom bridge network - containers can reach each other using service names
-# like "backend" and "frontend" instead of IP addresses
+# ──────────────────────────────────────────
+# Networks
+# ──────────────────────────────────────────
+# Custom bridge network — containers can reach each other
+# using their service names (e.g., "backend", "frontend")
+# instead of IP addresses.
 networks:
   app-network:
     driver: bridge
