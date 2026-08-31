@@ -21,21 +21,20 @@ app.post("/submit", async (req, res) => {
   const { name, email, message } = req.body;
 
   try {
-    const result = await axios.post(BACKEND_URL + "/submit", {
+    const response = await axios.post(`${BACKEND_URL}/submit`, {
       name,
       email,
       message,
     });
-    res.render("index", { response: result.data, error: null });
+    res.render("index", { response: response.data, error: null });
   } catch (err) {
-    let errorMsg = "Could not connect to backend";
-    if (err.response && err.response.data && err.response.data.error) {
-      errorMsg = err.response.data.error;
-    }
+    const errorMsg =
+      err.response?.data?.error || "Failed to communicate with backend server";
     res.render("index", { response: null, error: errorMsg });
   }
 });
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Frontend running on http://localhost:${PORT}`);
+  console.log(`Frontend server listening on port ${PORT}`);
 });
+

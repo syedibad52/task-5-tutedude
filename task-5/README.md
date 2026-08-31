@@ -1,89 +1,127 @@
-# Docker Full Stack App
+# Docker Task 5 - Multi-Container Web Application
 
-A simple multi-container application with Node.js/Express frontend and Python/Flask backend, managed with Docker Compose.
+This repository contains a containerized full-stack web application built using **Node.js (Express)** for the frontend and **Python (Flask)** for the backend, orchestrated with **Docker Compose**.
 
-## Overview
+---
 
-This project shows how to containerize a full-stack app with two separate services. The frontend is a Node.js Express server that serves a contact form, and the backend is a Python Flask API that processes form submissions. Both run in Docker containers and communicate over a shared network.
-
-## Architecture
+## 🏗️ Architecture & Networking
 
 ```
-Frontend (Express, port 3000)
-           |
-           v
-Backend (Flask, port 5000)
++-------------------------------------------------------------------+
+|                        Docker Bridge Network                      |
+|                                                                   |
+|   +-----------------------+           +-----------------------+   |
+|   |   Frontend Service    |  HTTP     |    Backend Service    |   |
+|   |  (Node.js / Express)  | --------> |    (Python / Flask)   |   |
+|   |     Port: 3000        |  POST     |      Port: 5000       |   |
+|   +-----------------------+           +-----------------------+   |
+|               ^                                                   |
++---------------+---------------------------------------------------+
+                |
+          Host Browser (http://localhost:3000)
 ```
 
-The frontend sends form data to the backend via HTTP. Both services run in their own containers but can communicate because they're on the same Docker network.
+### Key Technical Details
+- **Frontend**: Express server renders an HTML form using EJS. When a user submits the form, Express makes a server-side `POST` request to `http://backend:5000/submit`.
+- **Backend**: Flask API endpoint `/submit` processes and validates JSON data, returning a status message.
+- **No CORS Needed**: Because form submissions are handled server-to-server between containers inside the internal Docker bridge network (`app-network`), browser CORS restrictions do not apply, and `flask-cors` is intentionally omitted.
 
-## Project Structure
+---
+
+## 📁 Project Structure
 
 ```
 task-5/
+├── backend/
+│   ├── app.py
+│   ├── Dockerfile
+│   └── requirements.txt
 ├── frontend/
 │   ├── Dockerfile
 │   ├── package.json
 │   ├── server.js
-│   ├── views/
-│   │   └── index.ejs
-│   └── public/
-│       └── style.css
-├── backend/
-│   ├── Dockerfile
-│   ├── app.py
-│   └── requirements.txt
-└── docker-compose.yaml
+│   ├── public/
+│   │   └── style.css
+│   └── views/
+│       └── index.ejs
+├── screenshots/
+│   ├── 01-project-structure.png
+│   ├── 02-architecture-diagram.png
+│   ├── 03-contact-form-ui.png
+│   ├── 04-docker-compose-running.png
+│   ├── 05-docker-hub-push.png
+│   └── 06-github-push.png
+├── docker-compose.yaml
+└── README.md
 ```
-
-## Running the App
-
-```bash
-# Build and run
-docker-compose up --build
-
-# Stop
-docker-compose down
-```
-
-The frontend will be at http://localhost:3000 and the backend at http://localhost:5000.
-
-## How It Works
-
-1. User opens http://localhost:3000 and sees a contact form
-2. User fills out the form and clicks submit
-3. The Express server sends the data to the Flask backend at http://backend:5000/submit
-4. Flask validates the data and returns a response
-5. The response is displayed to the user
-
-The key is that the frontend and backend are on the same Docker network, so they can find each other using service names (e.g., `http://backend:5000` instead of localhost).
-
-## Pushing to Docker Hub
-
-```bash
-docker login
-docker build -t myusername/task5-frontend:latest -f frontend/Dockerfile frontend/
-docker build -t myusername/task5-backend:latest -f backend/Dockerfile backend/
-docker push myusername/task5-frontend:latest
-docker push myusername/task5-backend:latest
-```
-
-Replace `myusername` with your Docker Hub username.
-
-## Tech Stack
-
-- **Frontend**: Node.js, Express, EJS
-- **Backend**: Python, Flask
-- **Orchestration**: Docker Compose
-- **Networking**: Docker bridge network
-| Backend | Python 3.9 + Flask 3.0 |
-| HTTP Client | Axios 1.6 |
-| Containerization | Docker + Docker Compose |
-| Template Engine | EJS |
-| CORS | flask-cors 4.0 |
 
 ---
 
-## 📄 License
+## 🚀 Local Deployment Instructions
 
-This project was created as part of the **TuteDude Docker Assignment (Task 5)**.
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/syedibad52/task-5-tutedude.git
+   cd task-5
+   ```
+
+
+2. **Start containers with Docker Compose**:
+   ```bash
+   docker-compose up --build
+   ```
+
+3. **Access the application**:
+   - Frontend UI: [http://localhost:3000](http://localhost:3000)
+   - Backend API: [http://localhost:5000](http://localhost:5000)
+
+4. **Stop the containers**:
+   ```bash
+   docker-compose down
+   ```
+
+---
+
+## 📦 Proof of Pushing Images to Docker Hub
+
+The frontend and backend images have been built, tagged, and pushed to Docker Hub repositories.
+
+### Build and Push Commands
+```bash
+# Login to Docker Hub
+docker login
+
+# Build images
+docker build -t syedibad52/task5-frontend:latest ./frontend
+docker build -t syedibad52/task5-backend:latest ./backend
+
+# Push images to Docker Hub
+docker push syedibad52/task5-frontend:latest
+docker push syedibad52/task5-backend:latest
+```
+
+### Docker Hub Repositories
+- **Frontend Image**: `docker.io/syedibad52/task5-frontend:latest`
+- **Backend Image**: `docker.io/syedibad52/task5-backend:latest`
+
+*(Screenshot evidence of pushed images is stored in `screenshots/05-docker-hub-push.png`)*
+
+---
+
+## 🐙 Proof of Pushing Code to GitHub
+
+The complete source code and project configuration have been committed and pushed to GitHub.
+
+### Git Commands Executed
+```bash
+git add .
+git commit -m "Fix mentor feedback: remove CORS, simplify comments, add deployment evidence"
+git push origin master
+```
+
+### GitHub Repository Link
+- **Repository URL**: `https://github.com/syedibad52/task-5-tutedude`
+
+*(Screenshot evidence of GitHub repository and commit history is stored in `screenshots/06-github-push.png`)*
+
+

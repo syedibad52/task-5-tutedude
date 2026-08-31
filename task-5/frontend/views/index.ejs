@@ -3,21 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Form — Docker Full Stack App</title>
-    <meta name="description" content="Contact form built with Node.js Express frontend and Python Flask backend, containerized with Docker Compose.">
+    <title>Contact Form - Multi-Container App</title>
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
     <div class="container">
-        <!-- Page Header -->
-        <h1>📬 Contact Form</h1>
-        <p class="subtitle">Docker Full Stack App — Node.js + Flask</p>
+        <h1>Contact Form</h1>
+        <p class="subtitle">Docker Containerized Application (Node.js + Flask)</p>
 
-        <!-- ── Success Message ── -->
-        <!-- Shown when the backend returns a successful response -->
         <% if (response) { %>
         <div class="msg success">
-            <strong>✅ Success!</strong> <%= response.message %>
+            <strong>Success!</strong> <%= response.message %>
             <br>
             <small>Name: <%= response.data.name %> | Email: <%= response.data.email %></small>
             <br>
@@ -25,16 +21,12 @@
         </div>
         <% } %>
 
-        <!-- ── Error Message ── -->
-        <!-- Shown when the backend returns an error or is unreachable -->
         <% if (error) { %>
         <div class="msg error">
-            <strong>❌ Error:</strong> <%= error %>
+            <strong>Error:</strong> <%= error %>
         </div>
         <% } %>
 
-        <!-- ── Contact Form ── -->
-        <!-- Submits to /submit (POST), which forwards data to Flask backend -->
         <form action="/submit" method="POST" id="contact-form">
             <div class="form-group">
                 <label for="name">Name</label>
@@ -54,10 +46,10 @@
             <button type="submit" id="submit-btn">Submit</button>
         </form>
 
-        <!-- Footer -->
         <div class="footer">
-            <p>Built with Node.js (Express) + Flask | Dockerized with Docker Compose</p>
+            <p>Task 5 - Docker Compose Multi-Container Application</p>
         </div>
     </div>
 </body>
 </html>
+
