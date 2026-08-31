@@ -32,12 +32,6 @@ services:
       retries: 3
       start_period: 10s
 
-# ──────────────────────────────────────────
-# Networks
-# ──────────────────────────────────────────
-# Custom bridge network — containers can reach each other
-# using their service names (e.g., "backend", "frontend")
-# instead of IP addresses.
 networks:
   app-network:
     driver: bridge
